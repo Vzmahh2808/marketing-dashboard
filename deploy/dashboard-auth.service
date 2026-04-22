@@ -1,0 +1,14 @@
+[Unit]
+Description=Dashboard Auth/API service
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/dashboard-auth
+EnvironmentFile=/opt/dashboard-auth/.env
+ExecStart=/usr/bin/node server.js
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
