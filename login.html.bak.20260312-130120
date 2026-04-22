@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Вход</title>
+  <style>
+    :root {
+      --bg:#0F1117; --surface:#1A1D27; --border:#2E3348; --text:#E8E9ED;
+      --muted:#8B8FA3; --primary:#3B82F6; --primary-light:#60A5FA; --danger:#EF4444;
+      --radius:12px; --font:Inter,-apple-system,BlinkMacSystemFont,sans-serif;
+    }
+    * { box-sizing:border-box; }
+    body {
+      margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+      background:var(--bg); color:var(--text); font-family:var(--font);
+    }
+    .card {
+      width:100%; max-width:380px; background:var(--surface); border:1px solid var(--border);
+      border-radius:var(--radius); padding:28px;
+    }
+    h1 { margin:0 0 8px; font-size:24px; }
+    p { margin:0 0 18px; color:var(--muted); font-size:14px; }
+    label { display:block; margin:12px 0 6px; font-size:13px; color:var(--muted); }
+    input {
+      width:100%; padding:12px 14px; border-radius:10px; border:1px solid var(--border);
+      background:#11141c; color:var(--text); outline:none;
+    }
+    button {
+      width:100%; margin-top:18px; padding:12px 14px; border:none; border-radius:10px;
+      background:var(--primary); color:#fff; font-size:14px; font-weight:600; cursor:pointer;
+    }
+    button:hover { background:var(--primary-light); }
+    .error { margin-top:12px; color:var(--danger); font-size:13px; min-height:18px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Вход</h1>
+    <p>Авторизация для дашборда.</p>
+    <form id="login-form">
+      <label for="login">Логин</label>
+      <input id="login" name="login" autocomplete="username" required>
+
+      <label for="password">Пароль</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required>
+
+      <button type="submit">Войти</button>
+      <div class="error" id="error-box"></div>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById('login-form');
+    const errorBox = document.getElementById('error-box');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorBox.textContent = '';
+
+      const login = document.getElementById('login').value.trim();
+      const password = document.getElementById('password').value;
+
+      try {
+        const resp = await fetch('/api/login', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ login, password })
+        });
+
+        const data = await resp.json().catch(() => ({}));
+
+        if (!resp.ok || !data.ok) {
+          errorBox.textContent = 'Неверный логин или пароль';
+          return;
+        }
+
+        location.href = '/app.html';
+      } catch (err) {
+        errorBox.textContent = 'Не удалось выполнить вход';
+      }
+    });
+  </script>
+</body>
+</html>

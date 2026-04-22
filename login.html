@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Корпоративный дашборд ООО Ориентир — вход</title>
+  <meta name="description" content="Внутренний корпоративный дашборд компании ООО Ориентир. Доступ только для авторизованных сотрудников.">
+  <meta name="robots" content="noindex,nofollow">
+  <style>
+    :root{
+      --bg:#0F1117; --surface:#1A1D27; --border:#2E3348; --text:#E8E9ED;
+      --muted:#8B8FA3; --primary:#3B82F6; --primary-light:#60A5FA; --danger:#EF4444;
+      --radius:14px; --font:Inter,-apple-system,BlinkMacSystemFont,sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+      background:linear-gradient(180deg,#0F1117 0%,#131722 100%);
+      color:var(--text); font-family:var(--font); padding:24px;
+    }
+    .wrap{width:100%; max-width:460px}
+    .card{
+      background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+      padding:28px; box-shadow:0 10px 30px rgba(0,0,0,.25);
+    }
+    .eyebrow{
+      display:inline-block; font-size:12px; letter-spacing:.08em; text-transform:uppercase;
+      color:var(--primary-light); margin-bottom:10px; font-weight:700;
+    }
+    h1{margin:0 0 8px; font-size:26px; line-height:1.2}
+    .subtitle{margin:0 0 18px; color:var(--muted); font-size:14px; line-height:1.55}
+    .notice{
+      margin:0 0 18px; padding:12px 14px; border:1px solid #23406b; border-radius:12px;
+      background:rgba(59,130,246,.08); color:#cfe1ff; font-size:13px; line-height:1.5;
+    }
+    label{
+      display:block; margin:12px 0 6px; font-size:13px; color:var(--muted); font-weight:600;
+    }
+    input{
+      width:100%; padding:12px 14px; border-radius:10px; border:1px solid var(--border);
+      background:#11141c; color:var(--text); outline:none; font-size:14px;
+    }
+    input:focus{border-color:var(--primary)}
+    button{
+      width:100%; margin-top:18px; padding:12px 14px; border:none; border-radius:10px;
+      background:var(--primary); color:#fff; font-size:14px; font-weight:700; cursor:pointer;
+    }
+    button:hover{background:var(--primary-light)}
+    button:disabled{opacity:.7; cursor:wait}
+    .error{margin-top:12px; color:var(--danger); font-size:13px; min-height:18px}
+    .footer{
+      margin-top:14px; color:var(--muted); font-size:12px; line-height:1.55;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="eyebrow">ООО Ориентир</div>
+      <h1>Корпоративный дашборд</h1>
+      <p class="subtitle">
+        Вход для сотрудников компании. Сервис предназначен для просмотра внутренних рабочих показателей и доступен только авторизованным пользователям.
+      </p>
+
+      <div class="notice">
+        Это внутренний корпоративный ресурс. Если вы открыли страницу по ошибке или у вас нет доступа, закройте ее и обратитесь к администратору.
+      </div>
+
+      <form id="login-form">
+        <label for="login">Логин</label>
+        <input id="login" name="login" autocomplete="username" required>
+
+        <label for="password">Пароль</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+
+        <button id="submit-btn" type="submit">Войти</button>
+        <div class="error" id="error-box"></div>
+      </form>
+
+      <div class="footer">
+        Администратор доступа: 12@gkorientir.ru<br>
+        Владелец ресурса: ООО Ориентир
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('login-form');
+    const errorBox = document.getElementById('error-box');
+    const submitBtn = document.getElementById('submit-btn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorBox.textContent = '';
+      submitBtn.disabled = true;
+
+      const login = document.getElementById('login').value.trim();
+      const password = document.getElementById('password').value;
+
+      try {
+        const resp = await fetch('/api/login', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ login, password })
+        });
+
+        const data = await resp.json().catch(() => ({}));
+
+        if (!resp.ok || !data.ok) {
+          errorBox.textContent = 'Неверный логин или пароль';
+          submitBtn.disabled = false;
+          return;
+        }
+
+        location.href = '/app.html';
+      } catch (err) {
+        errorBox.textContent = 'Ошибка соединения. Попробуйте еще раз.';
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
